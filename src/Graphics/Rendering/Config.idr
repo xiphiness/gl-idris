@@ -1,3 +1,3 @@
-%flag C "-I/usr/local/Cellar/glew/1.12.0/include -I/usr/local/Cellar/libpng/1.6.25/include/libpng16 "
-%flag C "-L/usr/local/Cellar/glew/1.12.0/lib -L/usr/local/Cellar/libpng/1.6.25/lib -lGLEW -lpng16 "
-%flag C "OpenGL -framework"
+%flag C "-I/nix/store/rcq128vq55nv4d4gqr4clyasg6zld9sy-mesa-19.1.5-dev/include -I/nix/store/rkkd7znrivqm37sbs5mj9954lmldrink-glew-2.1.0-dev/include -I/nix/store/xpzfnwicijd2l21azlrgkwdr42clc190-glu-9.0.1-dev/include -I/nix/store/031c5pk5lzabgmpqpyd46hzi625as6bp-libpng-apng-1.6.37-dev/include/libpng16 -I/nix/store/24rw4c3nm4nlsvq5hxbc2bc8gbzw1jib-zlib-1.2.11-dev/include"
+%flag C "-L/nix/store/s2nz5pzn6m31jwndq8p48cfqpdfrx7g4-libglvnd-1.0.0/lib -L/nix/store/9kc72g8apidhdjb6mfqfv2dp3hywzh0k-glew-2.1.0/lib -L/nix/store/bdgnd4v8lzgvylybc13dlcm97afk7af5-glu-9.0.1/lib -L/nix/store/bcw1cimbj66vlck3lv3hh770cqhxp1zb-libpng-apng-1.6.37/lib -L/nix/store/3bfzi6w3067hbdyl15vmypjn4q6az9j6-zlib-1.2.11/lib -lGLEW -lGLU -lGL -lpng16 -lz"
+%flag C "-lGL"

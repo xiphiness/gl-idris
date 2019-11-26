@@ -17,10 +17,10 @@ vtx : Double -> Double -> Double -> Vec3
 vtx x y z = [x, y, z]
 
 uv : Double -> Double -> Vec2
-uv u v = [u, v] 
+uv u v = [u, v]
 
 Index : Type
-Index = (Int, Int, Int)                  
+Index = (Int, Int, Int)
 
 export
 data ObjLine
@@ -30,8 +30,8 @@ data ObjLine
   | Face Index Index Index
   | Comment String
   | Ignored String
-  
-  
+
+
 implementation Show ObjLine where
   show (Position v)       = "Position " ++ (show v)
   show (TextureCoord uv)  = "TextureCoord " ++ (show uv)
@@ -39,7 +39,7 @@ implementation Show ObjLine where
   show (Face v1 v2 v3)    = "Face " ++ (show v1) ++ " " ++ (show v2) ++ " " ++ (show v3)
   show (Comment s)        = "Comment " ++ s
   show (Ignored s)        = "Ignored " ++ s
-  
+
 -- ------------------------------------------------------------------ [ Tokens ]
 
 notEol : Monad m => ParserT String m Char
@@ -79,21 +79,21 @@ double = map scientificToFloat parseScientific
 
 -- ---------------------------------------------------------- [ OBJ Format ]
 
-position : Parser ObjLine 
+position : Parser ObjLine
 position = do token "v"
               x <- lexeme double
               y <- lexeme double
               z <- lexeme double
               pure $ Position $ vtx x y z
 
-normal : Parser ObjLine 
+normal : Parser ObjLine
 normal = do token "vn"
             x <- lexeme double
             y <- lexeme double
             z <- lexeme double
             pure $ Normal $ vtx x y z
 
-textureCoord : Parser ObjLine 
+textureCoord : Parser ObjLine
 textureCoord= do token "vt"
                  u <- lexeme double
                  v <- lexeme double
@@ -115,12 +115,12 @@ face = do token "f"
 ignored : Parser ObjLine
 ignored = do cont <- (many notEol) <?> "ignored"
              pure $ Ignored (cast cont)
-                
+
 comment : Parser ObjLine
 comment = do string "#"
              cont <- many notEol
              pure $ Comment $ cast cont
-             
+
 line : Parser ObjLine
 line = position <|> normal <|> textureCoord <|> face <|> comment <|> ignored
 
@@ -128,7 +128,7 @@ parseLine : String -> List ObjLine
 parseLine input = case parse line input of
   Left  e => [] -- ignore Errors for now
   Right x => [x]
-  
+
 processLines : List ObjLine -> (List Vec3, List Vec3, List Vec2, List Index)
 processLines lines = processLines' lines [] [] [] []
                    where processLines' : List ObjLine
@@ -139,14 +139,14 @@ processLines lines = processLines' lines [] [] [] []
                                        -> (List Vec3, List Vec3, List Vec2, List Index)
                          processLines' []         pos norm uvs ind = (reverse pos, reverse norm, reverse uvs, reverse ind)
                          processLines' (l :: ls)  pos norm uvs ind = case l of
-                           Position v      => processLines' ls (v :: pos)       norm        uvs                     ind 
-                           Normal v        => processLines' ls       pos  (v :: norm)       uvs                     ind 
-                           TextureCoord uv => processLines' ls       pos        norm (uv :: uvs)                    ind 
+                           Position v      => processLines' ls (v :: pos)       norm        uvs                     ind
+                           Normal v        => processLines' ls       pos  (v :: norm)       uvs                     ind
+                           TextureCoord uv => processLines' ls       pos        norm (uv :: uvs)                    ind
                            Face i1 i2 i3   => processLines' ls       pos        norm        uvs  (i1 :: i2 :: i3 :: ind)
                            _               => processLines' ls       pos        norm        uvs                     ind
-      
-                                                                  
-                                                                                                                              
+
+
+
 mapByIndex : List a -> M.SortedMap Int a
 mapByIndex [] = M.empty
 mapByIndex (x :: xs) = mapByIndex' (cast $ (length xs)) empty (reverse (x :: xs))
@@ -161,7 +161,7 @@ record VertexData where
   normal   : Vec3
 
 
-getData : Index 
+getData : Index
           -> M.SortedMap Int Vec3
           -> M.SortedMap Int Vec3
           -> M.SortedMap Int Vec2
@@ -199,23 +199,23 @@ processFace (f::faces)  p n t cnt indices vData buffer = case (lookup f indices)
 
 
 computeModel : List ObjLine -> Mesh
-computeModel objLines = 
-  let 
+computeModel objLines =
+  let
     (positions, normals, uvs, indices) = processLines objLines
     mappedPositions  = mapByIndex positions  -- Map Int Vertex
     mappedNormals    = mapByIndex normals    -- Map Int Vertex
     mappedUvs        = mapByIndex uvs        -- Map Int UV
     positionIndices = reverse $ map fst indices
     (posn, vData) = processFace indices mappedPositions mappedNormals mappedUvs 0 M.empty M.empty []
-    
+
     (positions, uvs, norms) = toVects {n=length vData} vData
-    
+
   in UvMesh positions norms uvs posn
 
 export
 loadObj : (filename: String) -> IO (Either FileError Mesh)
 loadObj fname = do Right handle <- openFile fname Read | Left err => pure (Left err)
-                   objLines <- parseFile' handle [] 
+                   objLines <- parseFile' handle []
                    closeFile handle
                    pure $ Right (computeModel objLines)
                 where
@@ -226,4 +226,3 @@ loadObj fname = do Right handle <- openFile fname Read | Left err => pure (Left 
                         if not x then do Right l <- fGetLine h | Left err => pure acc
                                          parseFile' h ((parseLine l) ++ acc)
                         else pure $ reverse acc
-                    

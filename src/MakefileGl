@@ -5,12 +5,12 @@ gl_idris.o: config gl_idris.c gl_idris.h
 
 # on mac we have to include the frameworks. On linux it should be -lGL (or so I guess)
 config: .PHONY
-	echo "%flag C \"`pkg-config --cflags glew libpng`\"" > Graphics/Rendering/Config.idr
-	echo "%flag C \"`pkg-config --libs glew libpng`\"" >> Graphics/Rendering/Config.idr
+	echo "%flag C \"`pkg-config --cflags gl glew libpng`\"" > Graphics/Rendering/Config.idr
+	echo "%flag C \"`pkg-config --libs gl glew libpng`\"" >> Graphics/Rendering/Config.idr
 
 	#echo "%flag C \"`pkg-config --libs --cflags libpng`\"" >> Graphics/Rendering/Config.idr
 	#echo "%flag C \"-framework OpenGL\"" >> Graphics/Rendering/Config.idr
-	echo "%flag C \"-lGL\"" >> Graphics/Rendering/Config.idr
+	#echo "%flag C \"-lGL\"" >> Graphics/Rendering/Config.idr
 	#echo "%flag C \"OpenGL -framework\"" >> Graphics/Rendering/Config.idr
 clean: .PHONY
 	rm gl_idris.o
